@@ -1,4 +1,6 @@
 import { EmbetsSerialEvent, type EmbetsSerial } from "../serial";
+import type { Packet } from "./packets/_packet";
+import { RequestRestartPacket } from "./packets/RequestRestartPacket";
 
 export class EmbetsProtocol {
   #serial?: EmbetsSerial;
@@ -11,6 +13,7 @@ export class EmbetsProtocol {
 
   async initialize(): Promise<void> {
     await this.#waitForSerialOpen();
+    this.#sendPacket(new RequestRestartPacket());
   }
 
   #waitForSerialOpen(): Promise<void> {
@@ -19,5 +22,11 @@ export class EmbetsProtocol {
 
       this.#serial.on(EmbetsSerialEvent.Open, resolve);
     });
+  }
+
+  #sendPacket(data: Packet): void {
+    if (!this.#serial) throw new Error("Serial not attached");
+
+    this.#serial.send(data.get());
   }
 }

@@ -20,6 +20,13 @@ export class EmbetsSerial {
     });
 
     this.#serialport.on("open", this.#onOpen.bind(this));
+    this.#serialport.on("data", (data: Buffer) => {
+      console.log(data.toString());
+    });
+  }
+
+  send(data: Uint8Array): void {
+    this.#serialport.write(data);
   }
 
   #onOpen() {
