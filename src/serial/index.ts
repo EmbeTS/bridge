@@ -24,8 +24,15 @@ export class EmbetsSerial {
     this.#serialport.on("data", this.#onData.bind(this));
   }
 
-  send(data: Uint8Array): void {
-    this.#serialport.write(data);
+  async send(data: Uint8Array) {
+    const chunkSize = 64;
+
+    for (let i = 0; i < data.length; i += chunkSize) {
+      const chunk = data.slice(i, i + chunkSize);
+      this.#serialport.write(chunk);
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
   }
 
   #onOpen() {

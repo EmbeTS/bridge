@@ -18,10 +18,10 @@ export class EmbetsBridge {
   }
 
   async fsWrite(path: string, data: string): Promise<void> {
-    this.#protocol.sendPacket(new FsWritePacket(path, data));
+    await this.#protocol.sendPacket(new FsWritePacket(path, data));
   }
 
   async osRestart(): Promise<void> {
-    this.#protocol.sendPacket(new RequestRestartPacket());
+    await this.#protocol.sendPacket(new RequestRestartPacket());
   }
 }

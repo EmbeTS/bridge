@@ -15,7 +15,7 @@ export class EmbetsProtocol {
   async initialize(): Promise<void> {
     await this.#waitForSerialOpen();
 
-    this.sendPacket(new RequestRestartPacket());
+    await this.sendPacket(new RequestRestartPacket());
     await this.#waitForSerialInitialized();
 
     this.#serial!.on(EmbetsSerialEvent.Data, (d: string) =>
@@ -49,9 +49,9 @@ export class EmbetsProtocol {
     });
   }
 
-  sendPacket(data: Packet): void {
+  async sendPacket(data: Packet) {
     if (!this.#serial) throw new Error("Serial not attached");
 
-    this.#serial.send(data.get());
+    await this.#serial.send(data.get());
   }
 }
