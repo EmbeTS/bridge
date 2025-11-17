@@ -1,4 +1,4 @@
-import { CFG_PCKT_START } from "../../config/packet";
+import { CFG_PCKT_END, CFG_PCKT_START } from "../../config/packet";
 
 export class Packet {
   #id: number;
@@ -8,6 +8,6 @@ export class Packet {
   }
 
   get(): Uint8Array {
-    return new Uint8Array([...CFG_PCKT_START, this.#id]);
+    return new Uint8Array([...CFG_PCKT_START, this.#id, ...CFG_PCKT_END]);
   }
 }

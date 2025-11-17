@@ -1,3 +1,4 @@
+import { CFG_BRIDGE_INIT_SEQ } from "../config/packet";
 import { EmbetsSerialEvent, type EmbetsSerial } from "../serial";
 import type { Packet } from "./packets/_packet";
 import { RequestRestartPacket } from "./packets/RequestRestartPacket";
@@ -14,6 +15,8 @@ export class EmbetsProtocol {
   async initialize(): Promise<void> {
     await this.#waitForSerialOpen();
     this.#sendPacket(new RequestRestartPacket());
+
+    await this.#waitForSerialInitialized();
   }
 
   #waitForSerialOpen(): Promise<void> {
@@ -21,6 +24,24 @@ export class EmbetsProtocol {
       if (!this.#serial) throw new Error("Serial not attached");
 
       this.#serial.on(EmbetsSerialEvent.Open, resolve);
+    });
+  }
+
+  #waitForSerialInitialized(): Promise<void> {
+    let buffer = "";
+
+    return new Promise((res) => {
+      const onData = (data: string) => {
+        buffer += data;
+
+        if (!buffer.includes(Buffer.from(CFG_BRIDGE_INIT_SEQ).toString()))
+          return;
+
+        this.#serial!.off(EmbetsSerialEvent.Data, onData);
+        res();
+      };
+
+      this.#serial?.on(EmbetsSerialEvent.Data, onData);
     });
   }
 

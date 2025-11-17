@@ -5,8 +5,14 @@
   "scripts": {
     "test": "tsx test/index.ts"
   },
+  "exports": {
+    "import": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
+    "dts-bundle-generator": "^9.5.1",
+    "sailet": "^0.1.1",
     "tsx": "^4.20.6"
   },
   "peerDependencies": {

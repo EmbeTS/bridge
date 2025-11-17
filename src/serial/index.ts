@@ -2,6 +2,7 @@ import { SerialPort } from "serialport";
 
 export enum EmbetsSerialEvent {
   Open = "open",
+  Data = "data",
 }
 
 export class EmbetsSerial {
@@ -20,9 +21,7 @@ export class EmbetsSerial {
     });
 
     this.#serialport.on("open", this.#onOpen.bind(this));
-    this.#serialport.on("data", (data: Buffer) => {
-      console.log(data.toString());
-    });
+    this.#serialport.on("data", this.#onData.bind(this));
   }
 
   send(data: Uint8Array): void {
@@ -33,12 +32,27 @@ export class EmbetsSerial {
     this.#emit(EmbetsSerialEvent.Open);
   }
 
+  #onData(data: Buffer) {
+    this.#emit(EmbetsSerialEvent.Data, data.toString());
+  }
+
   on(event: EmbetsSerialEvent, listener: Function) {
     if (!this.#eventListeners.has(event)) {
       this.#eventListeners.set(event, []);
     }
 
     this.#eventListeners.get(event)?.push(listener);
+  }
+
+  off(event: EmbetsSerialEvent, listener: Function) {
+    const listeners = this.#eventListeners.get(event);
+    if (!listeners) return;
+
+    const index = listeners.indexOf(listener);
+
+    if (index !== -1) {
+      listeners.splice(index, 1);
+    }
   }
 
   #emit(event: EmbetsSerialEvent, ...args: any[]) {
