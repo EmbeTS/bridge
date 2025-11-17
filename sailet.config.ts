@@ -7,5 +7,6 @@ script("build", () => [
     cmd(
       $`bun build --outdir dist --target node --packages external src/index.ts`
     ),
+    cmd($`dts-bundle-generator -o dist/index.d.ts src/index.ts`),
   ]),
 ]);
